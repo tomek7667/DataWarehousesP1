@@ -4,6 +4,7 @@ import numpy as np
 from datetime import timedelta
 from datetime import datetime
 from inserts import *
+from tempFilesManager import removeTemporaryFiles, resetTemporaryFiles
 
 # Variables:
 equipmentN = 1000
@@ -240,11 +241,7 @@ resetThunders = open("P1_WAS_THUNDER.txt", "w").close()
 resetThunders = open("P2_WAS_THUNDER.txt", "w").close()
 resetInsert = open("P1_INSERTS.txt", "w").close()
 resetInsert = open("P2_INSERTS.txt", "w").close()
-thunders = open("TMP_thunder.txt", "w").close()
-toInsert = open("TMP_in.txt", "w").close()
-toInsertEq = open("TMP_eqP1.txt", "w").close()
-toInsertEq = open("TMP_eqP2.txt", "w").close()
-insertP1_withoutEq = open("TMP_p1.txt", "w").close()
+resetTemporaryFiles()
 # reset excela dodać
 
 # good bad thunder
@@ -253,11 +250,11 @@ equipmentsS1 = [Equipment(i, 1) for i in range(1, equipmentN + 1)]
 equipmentsS2 = [Equipment(i + equipmentN, 3) for i in range(1, equipmentN2 + 1)]
 # equipmentsS3 = [Equipment(i + 2 * equipmentN2, 3) for i in range(1, equipmentN + 1)]
 
-
 def main():
     thunders = open("P1_WAS_THUNDER.txt", "a")
     toInsert = open("TMP_p1.txt", "a")
     toInsertEq = open("TMP_eqP1.txt", "a")
+
     for i in range(equipmentN):
         toInsertEq.write(insertEquipment(equipmentsS1[i]) + '\n')
     toInsertEq.close()
@@ -463,7 +460,7 @@ def main():
     toInsertEquipment1.close()
     toInsertEquipment2.close()
     insertP1_withoutEq.close()
-
+    removeTemporaryFiles()
 
 if __name__ == "__main__":
     main()
