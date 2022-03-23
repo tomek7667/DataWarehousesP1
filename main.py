@@ -9,7 +9,7 @@ from inserts import *
 equipmentN = 1000
 equipmentN2 = 150
 cashiersN = 50
-chanceForQuestionnaire = 0  # in percents
+chanceForQuestionnaire = 50  # in percents
 chanceForNotTakingAllEquipment = 90 # 100 - always with himself
 chanceForPriceChangeInPeriod2 = 30 #nie dotyczy rentali bo tam kazde sie zmienia
 rentalPriceS1 = [15, 5, 15, 10, 10]
