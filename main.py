@@ -243,10 +243,10 @@ toInsert = open("insertsPeriod_tmp.txt", "w").close()
 
 # good bad thunder
 
-equipmentsS1 = [Equipment(i, 1) for i in range(equipmentN)]
+equipmentsS1 = [Equipment(i, 1) for i in range(1, equipmentN + 1)]
 # pytanie jak z cenami i czy nie lepiej zrobic jedna tablice sprzetu po prostu
-# equipmentsS2 = [Equipment(i + equipmentN, 2) for i in range(equipmentN)]
-# equipmentsS3 = [Equipment(i + 2 * equipmentN, 3) for i in range(equipmentN)]
+# equipmentsS2 = [Equipment(i + equipmentN, 2) for i in range(1, equipmentN + 1)]
+# equipmentsS3 = [Equipment(i + 2 * equipmentN, 3) for i in range(1, equipmentN + 1)]
 
 
 def main():
@@ -299,20 +299,16 @@ def main():
             rentAmount = 0
             for j in range(howManyEquipments):
                 tempEq = random.choice(equipmentsS1)
-                print(tempEq)
                 if tempEq.isOnShelf == 1 and tempEq.isRental == 1:
-                    print('Na wypozyczanie!')
                     # For renting
                     equipmentsToRent.append(tempEq)
                     rentAmount += tempEq.price
                 elif tempEq.isOnShelf == 1 and tempEq.isRental == 0:
                     # For shop
-                    print('Na sprzedaz!')
                     equipmentsToBuy.append(tempEq)
                     shopAmount += tempEq.price
                 else:
                     # In storage
-                    print('Do pieca!')
                     pass
             # Tworzenie class dla sprzedaży
             if len(equipmentsToBuy) > 0:
