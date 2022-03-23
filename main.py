@@ -8,7 +8,7 @@ from datetime import datetime
 equipmentN = 1000
 cashiersN = 50
 chanceForQuestionnaire = 50  # in percents
-chanceForNotTakingAllEquipment = 10 # in percents
+chanceForNotTakingAllEquipment = 90 # 100 - always with himself
 rentalPriceS1 = [15, 5, 15, 10, 10]
 rentalPriceS2 = [20, 6, 20, 10, 8]
 rentalPriceS3 = [25, 7, 15, 12, 11]
@@ -331,11 +331,11 @@ def main():
             rentAmount = 0
             for j in range(howManyEquipments):
                 tempEq = random.choice(equipmentsS1)
-                if tempEq.isOnShelf and tempEq.isRental:
+                if tempEq.isOnShelf == 1 and tempEq.isRental == 1:
                     # For renting
                     equipmentsToRent.append(tempEq)
                     rentAmount += tempEq.price
-                elif not tempEq.isRental and tempEq.isOnShelf:
+                elif tempEq.isOnShelf == 1 and tempEq.isRental == 0:
                     # For shop
                     equipmentsToBuy.append(tempEq)
                     shopAmount += tempEq.price
