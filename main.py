@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from datetime import timedelta
 from datetime import datetime
+from inserts import *
 
 # Variables:
 equipmentN = 1000
@@ -32,7 +33,6 @@ isRental = [0, 1]
 isOnShelf = [0, 1]
 price = range(minimumEquipmentPrice, biggestEquipmentPrice, 25)
 inStock = range(0, 11)
-
 
 # Class
 class Equipment:
@@ -64,7 +64,7 @@ class Equipment:
         self.ID = ID
 
     def __str__(self):
-        return f"Equipment: {self.name}, {self.brandName}, {self.size}, {self.price} : {self.inStock} sztuk"
+        return f"Equipment: {self.name}, {self.brandName}, {self.size}, {self.price} : {self.inStock} sztuk | Availlability: {self.isOnShelf}"
 
 
 # CASHIERS
@@ -233,38 +233,6 @@ class Questionnaire:
         self.eqGeneralRating = 0.3 * self.comfort + 0.2 * self.rentPrice + 0.1 * self.visage + 0.4 * self.overall
 
 
-def insertEquipment(eq):
-    return f"INSERT INTO equipments (name, brandName, size, isRental, isOnShelf, price, inStock) VALUES (" + "'" + eq.name + "', '" + eq.brandName + "', '" + str(
-        eq.size) + "', " + str(eq.isRental) + ", " + str(eq.isOnShelf) + ", " + str(eq.price) + ", " + str(
-        eq.inStock) + ");"
-
-
-def insertCashier(ca):
-    return f"INSERT INTO cashiers (pesel, name, surname, dateOfEmployment) VALUES ('{ca.pesel}', " + "'" + str(
-        ca.name) + "', '" + str(ca.surname) + "', '" + str(ca.dateOfEmployment) + "');"
-
-
-def insertBill(bill):
-    return f"INSERT INTO bills (cashierID, amount, paymentDatetime) VALUES ({bill.cashierID}, {bill.amount}, " + "'" + str(
-        bill.paymentDatetime) + "');"
-
-
-def insertEquipmentBill(equipmentbill):
-    return f"INSERT INTO equipmentsbills (billNumber, equipmentID, amountPaid) VALUES ({equipmentbill.billNumber}, {equipmentbill.equipmentID}, {equipmentbill.amountPaid});"
-
-
-def insertRental(rt):
-    return f"INSERT INTO rental (name, surname, billNumber, isReturned) VALUES ('{rt.name}', '{rt.surname}', {str(rt.billNumber)}, {str(rt.isReturned)});"
-
-
-def insertSpecificRental(specificrental):
-    return f"INSERT INTO specificrentals (rentalID, equipmentID, startDatetime, plannedEndDatetime, actualEndDatetime, moneyOwed) VALUES ({specificrental.rentalID}, {specificrental.equipmentID}, " + "'" + \
-           str(specificrental.startDatetime).replace("T", " ").split(".")[0] + "', '" + \
-           str(specificrental.plannedEndDatetime).replace("T", " ").split(".")[0] + "', '" + \
-           str(specificrental.actualEndDatetime).replace("T", " ").split(".")[0] + "', " + str(
-        specificrental.moneyOwed) + ");"
-
-
 resetThunders = open("wasthunderPeriod1.txt", "w").close()
 resetThunders = open("wasthunderPeriod2.txt", "w").close()
 resetInsert = open("insertsPeriod1.txt", "w").close()
@@ -371,6 +339,9 @@ def main():
                 startDatetime = np.datetime64(
                     str(currentDay)[:-18] + str(random.randint(8, 18)).zfill(2) + ":" +
                     str(random.randint(0, 59)).zfill(2) + ":" + str(random.randint(0, 59)).zfill(2) + ".000000000")
+                timestamp = pd.Timestamp(startDatetime)
+                startHour = timestamp.hour
+                plannedEndHour = random.randint(startHour + 1, 20)
                 shouldRandomiseStart = random.randint(0, 100) > chanceForNotTakingAllEquipment
                 for eq in equipmentsToRent:
                     if shouldRandomiseStart:
@@ -378,13 +349,13 @@ def main():
                             str(currentDay)[:-18] + str(random.randint(8, 18)).zfill(2) + ":" +
                             str(random.randint(0, 59)).zfill(2) + ":" + str(random.randint(0, 59)).zfill(
                                 2) + ".000000000")
+                        timestamp = pd.Timestamp(startDatetime)
+                        # do dwudziestej mozna max oddac
+                        startHour = timestamp.hour
+                        plannedEndHour = random.randint(startHour + 1, 20)
                     equipmentbill = EquipmentsBills(billID, eq.ID, eq.price)
                     toInsert.write(insertEquipmentBill(equipmentbill) + '\n')
                     howManyMinutesLate = 0
-                    timestamp = pd.Timestamp(startDatetime)
-                    # do dwudziestej mozna max oddac
-                    startHour = timestamp.hour
-                    plannedEndHour = random.randint(startHour + 1, 20)
                     if plannedEndHour == 20:
                         plannedEndDatetime = np.datetime64(
                             str(startDatetime)[:-18] + str(plannedEndHour).zfill(2) + ":00:00.000000000")
@@ -392,7 +363,7 @@ def main():
                         plannedEndDatetime = np.datetime64(
                             str(startDatetime)[:-18] + str(plannedEndHour).zfill(2) + ":" + str(
                                 startDatetime)[14:])
-                    if plannedEndHour != 20 and random.randint(0, 100) < 10:
+                    if not shouldRandomiseStart and plannedEndHour != 20 and random.randint(0, 100) < 10:
                         howManyMinutesLate = random.choice(
                             range(10, (20 - pd.Timestamp(plannedEndDatetime).hour) * 60, 10))
                         actualEndDatetime = plannedEndDatetime + np.timedelta64(howManyMinutesLate, 'm')
