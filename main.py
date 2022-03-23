@@ -10,7 +10,7 @@ from FilesManager import removeTemporaryFiles, resetTemporaryFiles, resetResultF
 equipmentN = 1000
 equipmentN2 = 150
 cashiersN = 50
-chanceForQuestionnaire = 50  # in percents
+chanceForQuestionnaire = 0  # in percents
 chanceForNotTakingAllEquipment = 90 # 100 - always with himself
 chanceForPriceChangeInPeriod2 = 30 #nie dotyczy rentali bo tam kazde sie zmienia
 rentalPriceS1 = [15, 5, 15, 10, 10]
@@ -243,7 +243,7 @@ resetTemporaryFiles()
 
 # good bad thunder
 
-equipmentsS1 = [Equipment(i, 1) for i in range(1, equipmentN + 1)]
+equipmentsS1 = [Equipment(i, 2) for i in range(1, equipmentN + 1)]
 equipmentsS2 = [Equipment(i + equipmentN, 3) for i in range(1, equipmentN2 + 1)]
 # equipmentsS3 = [Equipment(i + 2 * equipmentN2, 3) for i in range(1, equipmentN + 1)]
 
