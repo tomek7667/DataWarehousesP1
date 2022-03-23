@@ -237,7 +237,7 @@ resetThunders = open("wasthunderPeriod1.txt", "w").close()
 resetThunders = open("wasthunderPeriod2.txt", "w").close()
 resetInsert = open("insertsPeriod1.txt", "w").close()
 resetInsert = open("insertsPeriod2.txt", "w").close()
-p1thunders = open("wasthunderPeriod_tmp.txt", "w").close()
+thunders = open("wasthunderPeriod_tmp.txt", "w").close()
 toInsert = open("insertsPeriod_tmp.txt", "w").close()
 # reset excela dodać
 
@@ -250,7 +250,7 @@ equipmentsS1 = [Equipment(i, 1) for i in range(1, equipmentN + 1)]
 
 
 def main():
-    p1thunders = open("wasthunderPeriod1.txt", "a")
+    thunders = open("wasthunderPeriod1.txt", "a")
     toInsert = open("insertsPeriod1.txt", "a")
     for i in range(equipmentN):
         toInsert.write(insertEquipment(equipmentsS1[i]) + '\n')
@@ -271,7 +271,8 @@ def main():
             season = 2
         elif str(currentDay)[:10] == '2020-12-01':
             season = 3
-            p1thunders = open("wasthunderPeriod_tmp.txt", "a")
+            thunders.close()
+            thunders = open("wasthunderPeriod_tmp.txt", "a")
             toInsert.close()
             toInsert = open("insertsPeriod_tmp.txt", "a")
             questionnaireExcel.to_excel('questionnairePeriod1.xlsx', index=False)
@@ -281,7 +282,7 @@ def main():
         isThunder = random.randint(0, 100) > 100 - thunderProbability
         isBadWeather = isThunder or random.randint(0, 100) > 100 - badWeatherProbability
         isGoodWeather = not (isThunder or isBadWeather)
-        p1thunders.write(str(currentDay) + " thunder: " + str(isThunder) + " isBadWeather: " + str(
+        thunders.write(str(currentDay) + " thunder: " + str(isThunder) + " isBadWeather: " + str(
             isBadWeather) + " wasGoodWeather: " + str(isGoodWeather) + "\n")
 
         if isThunder:
@@ -390,26 +391,30 @@ def main():
     questionnaireExcel = pd.concat([questionnaire1, questionnaireExcel])
     questionnaireExcel.to_excel(r'questionnairePeriod2.xlsx', index=False)
 
-    p1thunders2 = open("wasthunderPeriod2.txt", "a")
-    p1thunders1 = open("wasthunderPeriod1.txt", "r")
-    p1thunders_tmp = open("wasthunderPeriod_tmp.txt", "r")
+    thunders.close()
+    toInsert.close()
 
-    toInsert1 = open("insertsPeriod1.txt", "r")
+    thunders2 = open("wasthunderPeriod2.txt", "a")
+    thunders1 = open("wasthunderPeriod1.txt", "r")
+    thunders_tmp = open("wasthunderPeriod_tmp.txt", "r")
+
     toInsert2 = open("insertsPeriod2.txt", "a")
+    toInsert1 = open("insertsPeriod1.txt", "r")
     toInsert_tmp = open("insertsPeriod_tmp.txt", "r")
-    for row in p1thunders1:
-        p1thunders2.write(row)
-    for row in p1thunders_tmp:
-        p1thunders2.write(row)
+
+    for row in thunders1:
+        thunders2.write(row)
+    for row in thunders_tmp:
+        thunders2.write(row)
 
     for row in toInsert1:
         toInsert2.write(row)
     for row in toInsert_tmp:
         toInsert2.write(row)
 
-    p1thunders1.close()
-    p1thunders2.close()
-    p1thunders_tmp.close()
+    thunders1.close()
+    thunders2.close()
+    thunders_tmp.close()
     toInsert1.close()
     toInsert2.close()
     toInsert_tmp.close()
