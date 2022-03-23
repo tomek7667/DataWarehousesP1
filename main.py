@@ -247,7 +247,8 @@ def insertSpecificRental(specificrental):
 	return f"INSERT INTO specificrentals (rentalID, equipmentID, startDatetime, plannedEndDatetime, actualEndDatetime, moneyOwed) VALUES ({specificrental.rentalID}, {specificrental.equipmentID}, " + "'" + str(specificrental.startDatetime).replace("T", " ").split(".")[0] + "', '" + str(specificrental.plannedEndDatetime).replace("T", " ").split(".")[0] + "', '" + str(specificrental.actualEndDatetime).replace("T", " ").split(".")[0] + "', " + str(specificrental.moneyOwed) + ");"
 
 
-resetThunders = open("wasthunder.txt", "w").close()
+resetThunders = open("wasthunderPeriod1.txt", "w").close()
+resetThunders = open("wasthunderPeriod2.txt", "w").close()
 resetInsert = open("insertsPeriod1.txt", "w").close()
 resetInsert = open("insertsPeriod2.txt", "w").close()
 p1thunders = open("wasthunderPeriod_tmp.txt", "w").close()
@@ -389,9 +390,9 @@ def main():
 	toInsert.close()
 	print("Petla skonczona; zaczynam excele:")
 	# Questionnaire zapis
-	# questionnaire1 = pd.read_excel('questionnairePeriod1.xlsx')
-	# questionnaireExcel = pd.concat([questionnaire1, questionnaireExcel])
-	# questionnaireExcel.to_excel(r'questionnairePeriod2.xlsx', index=False)
+	questionnaire1 = pd.read_excel('questionnairePeriod1.xlsx')
+	questionnaireExcel = pd.concat([questionnaire1, questionnaireExcel])
+	questionnaireExcel.to_excel(r'questionnairePeriod2.xlsx', index=False)
 
 	p1thunders2 = open("wasthunderPeriod2.txt", "a")
 	p1thunders1 = open("wasthunderPeriod1.txt", "r")
