@@ -8,6 +8,7 @@ from datetime import datetime
 equipmentN = 1000
 cashiersN = 50
 chanceForQuestionnaire = 50  # in percents
+chanceForNotTakingAllEquipment = 10 # in percents
 rentalPriceS1 = [15, 5, 15, 10, 10]
 rentalPriceS2 = [20, 6, 20, 10, 8]
 rentalPriceS3 = [25, 7, 15, 12, 11]
@@ -370,7 +371,7 @@ def main():
                 startDatetime = np.datetime64(
                     str(currentDay)[:-18] + str(random.randint(8, 18)).zfill(2) + ":" +
                     str(random.randint(0, 59)).zfill(2) + ":" + str(random.randint(0, 59)).zfill(2) + ".000000000")
-                shouldRandomiseStart = random.randint(0, 100) > 10
+                shouldRandomiseStart = random.randint(0, 100) > chanceForNotTakingAllEquipment
                 for eq in equipmentsToRent:
                     if shouldRandomiseStart:
                         startDatetime = np.datetime64(
