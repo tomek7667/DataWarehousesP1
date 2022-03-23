@@ -26,7 +26,7 @@ rentalPriceS2 = [20, 6, 20, 10, 8]
 rentalPriceS3 = [25, 7, 15, 12, 11]
 inStock = range(0, 11)
 
-
+TEST
 # Class
 class Equipment:
 	def __init__(self, ID, season=1):
