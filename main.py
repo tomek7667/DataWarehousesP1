@@ -462,6 +462,7 @@ def main():
     toInsertEquipment2.close()
     insertP1_withoutEq.close()
     removeTemporaryFiles()
+    print(rentalID)
 
 if __name__ == "__main__":
     main()
