@@ -415,6 +415,7 @@ def main():
                 billID += 1
                 rentalID += 1
 
+
     print("Loop ended. Starting generating excel files:")
     # Questionnaire zapis
     questionnaire1 = pd.read_excel('./results/questionnairePeriod1.xlsx')
