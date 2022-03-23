@@ -7,7 +7,16 @@ from datetime import datetime
 # Variables:
 equipmentN = 1000
 cashiersN = 50
-chanceForQuestionnaire = 0 # in percents
+chanceForQuestionnaire = 50  # in percents
+rentalPriceS1 = [15, 5, 15, 10, 10]
+rentalPriceS2 = [20, 6, 20, 10, 8]
+rentalPriceS3 = [25, 7, 15, 12, 11]
+biggestEquipmentPrice = 1500
+minimumEquipmentPrice = 50
+thunderProbability = 2  # procentowo
+badWeatherProbability = 10  # procentowo
+peopleFactor = 1  # Mnożnik ludzi - ~200k insertów overall to 1
+maxEquipmentTransactionsPerPerson = 5
 
 # ---
 # Loading lists
