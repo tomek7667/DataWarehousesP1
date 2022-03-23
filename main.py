@@ -7,9 +7,11 @@ from inserts import *
 
 # Variables:
 equipmentN = 1000
+equipmentN2 = 150
 cashiersN = 50
-chanceForQuestionnaire = 50  # in percents
+chanceForQuestionnaire = 0  # in percents
 chanceForNotTakingAllEquipment = 90 # 100 - always with himself
+chanceForPriceChangeInPeriod2 = 30 #nie dotyczy rentali bo tam kazde sie zmienia
 rentalPriceS1 = [15, 5, 15, 10, 10]
 rentalPriceS2 = [20, 6, 20, 10, 8]
 rentalPriceS3 = [25, 7, 15, 12, 11]
@@ -33,6 +35,7 @@ isRental = [0, 1]
 isOnShelf = [0, 1]
 price = range(minimumEquipmentPrice, biggestEquipmentPrice, 25)
 inStock = range(0, 11)
+inStockP2 = [0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8]
 
 # Class
 class Equipment:
@@ -233,27 +236,55 @@ class Questionnaire:
         self.eqGeneralRating = 0.3 * self.comfort + 0.2 * self.rentPrice + 0.1 * self.visage + 0.4 * self.overall
 
 
-resetThunders = open("wasthunderPeriod1.txt", "w").close()
-resetThunders = open("wasthunderPeriod2.txt", "w").close()
-resetInsert = open("insertsPeriod1.txt", "w").close()
-resetInsert = open("insertsPeriod2.txt", "w").close()
-thunders = open("wasthunderPeriod_tmp.txt", "w").close()
-toInsert = open("insertsPeriod_tmp.txt", "w").close()
+resetThunders = open("P1_WAS_THUNDER.txt", "w").close()
+resetThunders = open("P2_WAS_THUNDER.txt", "w").close()
+resetInsert = open("P1_INSERTS.txt", "w").close()
+resetInsert = open("P2_INSERTS.txt", "w").close()
+thunders = open("TMP_thunder.txt", "w").close()
+toInsert = open("TMP_in.txt", "w").close()
+toInsertEq = open("TMP_eqP1.txt", "w").close()
+toInsertEq = open("TMP_eqP2.txt", "w").close()
+insertP1_withoutEq = open("TMP_p1.txt", "w").close()
 # reset excela dodać
 
 # good bad thunder
 
 equipmentsS1 = [Equipment(i, 1) for i in range(1, equipmentN + 1)]
-# pytanie jak z cenami i czy nie lepiej zrobic jedna tablice sprzetu po prostu
-# equipmentsS2 = [Equipment(i + equipmentN, 2) for i in range(1, equipmentN + 1)]
-# equipmentsS3 = [Equipment(i + 2 * equipmentN, 3) for i in range(1, equipmentN + 1)]
+equipmentsS2 = [Equipment(i + equipmentN, 3) for i in range(1, equipmentN2 + 1)]
+# equipmentsS3 = [Equipment(i + 2 * equipmentN2, 3) for i in range(1, equipmentN + 1)]
 
 
 def main():
-    thunders = open("wasthunderPeriod1.txt", "a")
-    toInsert = open("insertsPeriod1.txt", "a")
+    thunders = open("P1_WAS_THUNDER.txt", "a")
+    toInsert = open("TMP_p1.txt", "a")
+    toInsertEq = open("TMP_eqP1.txt", "a")
     for i in range(equipmentN):
-        toInsert.write(insertEquipment(equipmentsS1[i]) + '\n')
+        toInsertEq.write(insertEquipment(equipmentsS1[i]) + '\n')
+    toInsertEq.close()
+
+    ########## ZMIANA CEN I ILOSCI EQUIPMENTU PO PERIODZIE 1 DLA P2
+
+    equipmentsS1_P2 = equipmentsS1
+    for i in range(len(equipmentsS1_P2)):
+        if equipmentsS1_P2[i].isRental:
+            equipmentsS1_P2[i].price = rentalPriceS3[whichName(equipmentsS1_P2[i].name)]
+        elif random.randint(0, 100) > chanceForPriceChangeInPeriod2:
+            equipmentsS1_P2[i].price = random.choice(price)
+
+        equipmentsS1_P2[i].inStock = random.choice(inStockP2)
+        if equipmentsS1_P2[i].inStock == 0:
+            equipmentsS1_P2[i].isOnShelf = 0
+        else:
+            equipmentsS1_P2[i].isOnShelf = random.choice(isOnShelf)
+
+    ##########
+
+    equipmentsP2 = equipmentsS1_P2 + equipmentsS2
+
+    toInsertEq = open("TMP_eqP2.txt", "a")
+    for i in range(equipmentN + equipmentN2): #ilosc equipmentu z periodu1 + ten nowo wygenerowany na period2
+        toInsertEq.write(insertEquipment(equipmentsP2[i]) + '\n')
+    toInsertEq.close()
     for i in range(1, cashiersN):
         toInsert.write(insertCashier(Cashier()) + '\n')
     # Żeby mieć pusty dataframe
@@ -264,6 +295,7 @@ def main():
     billID = 1  # Kolejne indeksy bill
     rentalID = 1  # Kolejne indeksy rentalID
     season = 1
+    equipmentsS = equipmentsS1 #bierzemy najpierw eq na period1 potem w warunku zmieni sie na ten zmergowany
     for day in period.values:
         print(day[0], period.values[-1][0])
         currentDay = day[0]
@@ -271,10 +303,11 @@ def main():
             season = 2
         elif str(currentDay)[:10] == '2020-12-01':
             season = 3
+            equipmentsS = equipmentsP2 #Period2
             thunders.close()
-            thunders = open("wasthunderPeriod_tmp.txt", "a")
+            thunders = open("TMP_thunder.txt", "a")
             toInsert.close()
-            toInsert = open("insertsPeriod_tmp.txt", "a")
+            toInsert = open("TMP_in.txt", "a")
             questionnaireExcel.to_excel('questionnairePeriod1.xlsx', index=False)
             questionnaireExcel = pd.DataFrame(columns=(
                 'fulfillment_date', 'price', 'name', 'brand_name', 'comfort', 'rentPrice', 'visage', 'overall',
@@ -299,7 +332,7 @@ def main():
             shopAmount = 0
             rentAmount = 0
             for j in range(howManyEquipments):
-                tempEq = random.choice(equipmentsS1)
+                tempEq = random.choice(equipmentsS)
                 if tempEq.isOnShelf == 1 and tempEq.isRental == 1:
                     # For renting
                     equipmentsToRent.append(tempEq)
@@ -384,7 +417,7 @@ def main():
                         questionnaireExcel = pd.concat([questionnaireExcel, qData])
                 billID += 1
                 rentalID += 1
-    toInsert.close()
+
     print("Petla skonczona; zaczynam excele:")
     # Questionnaire zapis
     questionnaire1 = pd.read_excel('questionnairePeriod1.xlsx')
@@ -394,20 +427,29 @@ def main():
     thunders.close()
     toInsert.close()
 
-    thunders2 = open("wasthunderPeriod2.txt", "a")
-    thunders1 = open("wasthunderPeriod1.txt", "r")
-    thunders_tmp = open("wasthunderPeriod_tmp.txt", "r")
+    thunders1 = open("P1_WAS_THUNDER.txt", "r")
+    thunders2 = open("P2_WAS_THUNDER.txt", "a")
+    thunders_tmp = open("TMP_thunder.txt", "r")
 
-    toInsert2 = open("insertsPeriod2.txt", "a")
-    toInsert1 = open("insertsPeriod1.txt", "r")
-    toInsert_tmp = open("insertsPeriod_tmp.txt", "r")
+    toInsert1 = open("P1_INSERTS.txt", "a")
+    toInsert2 = open("P2_INSERTS.txt", "a")
+    insertP1_withoutEq = open("TMP_p1.txt", "r")
+    toInsert_tmp = open("TMP_in.txt", "r")
+
+    toInsertEquipment1 = open("TMP_eqP1.txt", "r")
+    toInsertEquipment2 = open("TMP_eqP2.txt", "r")
 
     for row in thunders1:
         thunders2.write(row)
     for row in thunders_tmp:
         thunders2.write(row)
 
-    for row in toInsert1:
+    for row in toInsertEquipment1:
+        toInsert1.write(row)
+    for row in toInsertEquipment2:
+        toInsert2.write(row)
+    for row in insertP1_withoutEq:
+        toInsert1.write(row)
         toInsert2.write(row)
     for row in toInsert_tmp:
         toInsert2.write(row)
@@ -418,6 +460,9 @@ def main():
     toInsert1.close()
     toInsert2.close()
     toInsert_tmp.close()
+    toInsertEquipment1.close()
+    toInsertEquipment2.close()
+    insertP1_withoutEq.close()
 
 
 if __name__ == "__main__":
