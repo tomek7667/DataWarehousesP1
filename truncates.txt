@@ -1,0 +1,1 @@
+TRUNCATE TABLE equipments;TRUNCATE TABLE equipmentsbills;TRUNCATE TABLE cashiers;TRUNCATE TABLE bills;TRUNCATE TABLE rental;TRUNCATE TABLE specificrentals;
