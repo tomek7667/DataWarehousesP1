@@ -4,13 +4,13 @@ import numpy as np
 from datetime import timedelta
 from datetime import datetime
 from inserts import *
-from FilesManager import removeTemporaryFiles, resetTemporaryFiles, resetResultFiles
+from tempFilesManager import removeTemporaryFiles, resetTemporaryFiles
 
 # Variables:
 equipmentN = 1000
 equipmentN2 = 150
 cashiersN = 50
-chanceForQuestionnaire = 0  # in percents
+chanceForQuestionnaire = 50  # in percents
 chanceForNotTakingAllEquipment = 90 # 100 - always with himself
 chanceForPriceChangeInPeriod2 = 30 #nie dotyczy rentali bo tam kazde sie zmienia
 rentalPriceS1 = [15, 5, 15, 10, 10]
@@ -237,18 +237,21 @@ class Questionnaire:
         self.eqGeneralRating = 0.3 * self.comfort + 0.2 * self.rentPrice + 0.1 * self.visage + 0.4 * self.overall
 
 
-resetResultFiles()
+resetThunders = open("P1_WAS_THUNDER.txt", "w").close()
+resetThunders = open("P2_WAS_THUNDER.txt", "w").close()
+resetInsert = open("P1_INSERTS.txt", "w").close()
+resetInsert = open("P2_INSERTS.txt", "w").close()
 resetTemporaryFiles()
 # reset excela dodać
 
 # good bad thunder
 
-equipmentsS1 = [Equipment(i, 2) for i in range(1, equipmentN + 1)]
+equipmentsS1 = [Equipment(i, 1) for i in range(1, equipmentN + 1)]
 equipmentsS2 = [Equipment(i + equipmentN, 3) for i in range(1, equipmentN2 + 1)]
 # equipmentsS3 = [Equipment(i + 2 * equipmentN2, 3) for i in range(1, equipmentN + 1)]
 
 def main():
-    thunders = open("./results/P1_WAS_THUNDER.txt", "a")
+    thunders = open("P1_WAS_THUNDER.txt", "a")
     toInsert = open("TMP_p1.txt", "a")
     toInsertEq = open("TMP_eqP1.txt", "a")
 
@@ -276,8 +279,7 @@ def main():
     equipmentsP2 = equipmentsS1_P2 + equipmentsS2
 
     toInsertEq = open("TMP_eqP2.txt", "a")
-    for i in range(equipmentN + equipmentN2):
-        # ilosc equipmentu z periodu1 + ten nowo wygenerowany na period2
+    for i in range(equipmentN + equipmentN2): #ilosc equipmentu z periodu1 + ten nowo wygenerowany na period2
         toInsertEq.write(insertEquipment(equipmentsP2[i]) + '\n')
     toInsertEq.close()
     for i in range(1, cashiersN):
@@ -290,22 +292,20 @@ def main():
     billID = 1  # Kolejne indeksy bill
     rentalID = 1  # Kolejne indeksy rentalID
     season = 1
-    equipmentsS = equipmentsS1
-    # bierzemy najpierw eq na period1 potem w warunku zmieni sie na ten zmergowany
-    for iteration, day in enumerate(period.values):
-        print(str(round((iteration/len(period.values))*10000)/100)+'%', day[0], period.values[-1][0])
+    equipmentsS = equipmentsS1 #bierzemy najpierw eq na period1 potem w warunku zmieni sie na ten zmergowany
+    for day in period.values:
+        print(day[0], period.values[-1][0])
         currentDay = day[0]
         if str(currentDay)[:10] == '2019-12-01':
             season = 2
         elif str(currentDay)[:10] == '2020-12-01':
             season = 3
-            # Period2
-            equipmentsS = equipmentsP2
+            equipmentsS = equipmentsP2 #Period2
             thunders.close()
             thunders = open("TMP_thunder.txt", "a")
             toInsert.close()
             toInsert = open("TMP_in.txt", "a")
-            questionnaireExcel.to_excel('./results/questionnairePeriod1.xlsx', index=False)
+            questionnaireExcel.to_excel('questionnairePeriod1.xlsx', index=False)
             questionnaireExcel = pd.DataFrame(columns=(
                 'fulfillment_date', 'price', 'name', 'brand_name', 'comfort', 'rentPrice', 'visage', 'overall',
                 'equipment_general_rating'))
@@ -415,22 +415,21 @@ def main():
                 billID += 1
                 rentalID += 1
 
-
-    print("Loop ended. Starting generating excel files:")
+    print("Petla skonczona; zaczynam excele:")
     # Questionnaire zapis
-    questionnaire1 = pd.read_excel('./results/questionnairePeriod1.xlsx')
+    questionnaire1 = pd.read_excel('questionnairePeriod1.xlsx')
     questionnaireExcel = pd.concat([questionnaire1, questionnaireExcel])
-    questionnaireExcel.to_excel('./results/questionnairePeriod2.xlsx', index=False)
+    questionnaireExcel.to_excel(r'questionnairePeriod2.xlsx', index=False)
 
     thunders.close()
     toInsert.close()
 
-    thunders1 = open("./results/P1_WAS_THUNDER.txt", "r")
-    thunders2 = open("./results/P2_WAS_THUNDER.txt", "a")
+    thunders1 = open("P1_WAS_THUNDER.txt", "r")
+    thunders2 = open("P2_WAS_THUNDER.txt", "a")
     thunders_tmp = open("TMP_thunder.txt", "r")
 
-    toInsert1 = open("./results/P1_INSERTS.sql", "a")
-    toInsert2 = open("./results/P2_INSERTS.sql", "a")
+    toInsert1 = open("P1_INSERTS.txt", "a")
+    toInsert2 = open("P2_INSERTS.txt", "a")
     insertP1_withoutEq = open("TMP_p1.txt", "r")
     toInsert_tmp = open("TMP_in.txt", "r")
 
@@ -451,7 +450,7 @@ def main():
         toInsert2.write(row)
     for row in toInsert_tmp:
         toInsert2.write(row)
-    print("Excel files generating ended.")
+
     thunders1.close()
     thunders2.close()
     thunders_tmp.close()
@@ -462,7 +461,6 @@ def main():
     toInsertEquipment2.close()
     insertP1_withoutEq.close()
     removeTemporaryFiles()
-    print(rentalID)
 
 if __name__ == "__main__":
     main()
