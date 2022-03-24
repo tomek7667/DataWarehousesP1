@@ -4,7 +4,7 @@ import numpy as np
 from datetime import timedelta
 from datetime import datetime
 from inserts import *
-from tempFilesManager import removeTemporaryFiles, resetTemporaryFiles
+from FilesManager import removeTemporaryFiles, resetTemporaryFiles, resetResultFiles
 
 # Variables:
 equipmentN = 1000
@@ -246,7 +246,7 @@ resetTemporaryFiles()
 
 # good bad thunder
 
-equipmentsS1 = [Equipment(i, 1) for i in range(1, equipmentN + 1)]
+equipmentsS1 = [Equipment(i, 2) for i in range(1, equipmentN + 1)]
 equipmentsS2 = [Equipment(i + equipmentN, 3) for i in range(1, equipmentN2 + 1)]
 # equipmentsS3 = [Equipment(i + 2 * equipmentN2, 3) for i in range(1, equipmentN + 1)]
 
