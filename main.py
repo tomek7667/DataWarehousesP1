@@ -237,10 +237,7 @@ class Questionnaire:
         self.eqGeneralRating = 0.3 * self.comfort + 0.2 * self.rentPrice + 0.1 * self.visage + 0.4 * self.overall
 
 
-resetThunders = open("P1_WAS_THUNDER.txt", "w").close()
-resetThunders = open("P2_WAS_THUNDER.txt", "w").close()
-resetInsert = open("P1_INSERTS.txt", "w").close()
-resetInsert = open("P2_INSERTS.txt", "w").close()
+resetResultFiles()
 resetTemporaryFiles()
 # reset excela dodać
 
@@ -251,7 +248,7 @@ equipmentsS2 = [Equipment(i + equipmentN, 3) for i in range(1, equipmentN2 + 1)]
 # equipmentsS3 = [Equipment(i + 2 * equipmentN2, 3) for i in range(1, equipmentN + 1)]
 
 def main():
-    thunders = open("P1_WAS_THUNDER.txt", "a")
+    thunders = open("./results/P1_WAS_THUNDER.txt", "a")
     toInsert = open("TMP_p1.txt", "a")
     toInsertEq = open("TMP_eqP1.txt", "a")
 
@@ -305,7 +302,7 @@ def main():
             thunders = open("TMP_thunder.txt", "a")
             toInsert.close()
             toInsert = open("TMP_in.txt", "a")
-            questionnaireExcel.to_excel('questionnairePeriod1.xlsx', index=False)
+            questionnaireExcel.to_excel('./results/questionnairePeriod1.xlsx', index=False)
             questionnaireExcel = pd.DataFrame(columns=(
                 'fulfillment_date', 'price', 'name', 'brand_name', 'comfort', 'rentPrice', 'visage', 'overall',
                 'equipment_general_rating'))
@@ -415,21 +412,21 @@ def main():
                 billID += 1
                 rentalID += 1
 
-    print("Petla skonczona; zaczynam excele:")
+    print("Loop ended. Starting generating excel files:")
     # Questionnaire zapis
-    questionnaire1 = pd.read_excel('questionnairePeriod1.xlsx')
+    questionnaire1 = pd.read_excel('./results/questionnairePeriod1.xlsx')
     questionnaireExcel = pd.concat([questionnaire1, questionnaireExcel])
-    questionnaireExcel.to_excel(r'questionnairePeriod2.xlsx', index=False)
+    questionnaireExcel.to_excel('./results/questionnairePeriod2.xlsx', index=False)
 
     thunders.close()
     toInsert.close()
 
-    thunders1 = open("P1_WAS_THUNDER.txt", "r")
-    thunders2 = open("P2_WAS_THUNDER.txt", "a")
+    thunders1 = open("./results/P1_WAS_THUNDER.txt", "r")
+    thunders2 = open("./results/P2_WAS_THUNDER.txt", "a")
     thunders_tmp = open("TMP_thunder.txt", "r")
 
-    toInsert1 = open("P1_INSERTS.txt", "a")
-    toInsert2 = open("P2_INSERTS.txt", "a")
+    toInsert1 = open("./results/P1_INSERTS.sql", "a")
+    toInsert2 = open("./results/P2_INSERTS.sql", "a")
     insertP1_withoutEq = open("TMP_p1.txt", "r")
     toInsert_tmp = open("TMP_in.txt", "r")
 
@@ -450,7 +447,7 @@ def main():
         toInsert2.write(row)
     for row in toInsert_tmp:
         toInsert2.write(row)
-
+    print("Excel files generating ended.")
     thunders1.close()
     thunders2.close()
     thunders_tmp.close()
