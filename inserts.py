@@ -1,5 +1,5 @@
 def insertEquipment(eq):
-    return f"INSERT INTO equipments (name, brandName, size, isRental, isOnShelf, price, inStock) VALUES (" + "'" + eq.name + "', '" + eq.brandName + "', '" + str(
+    return f"INSERT INTO equipments (model, name, brandName, size, isRental, isOnShelf, price, inStock) VALUES ('" + eq.model + "', " + "'" + eq.name + "', '" + eq.brandName + "', '" + str(
         eq.size) + "', " + str(eq.isRental) + ", " + str(eq.isOnShelf) + ", " + str(eq.price) + ", " + str(
         eq.inStock) + ");"
 
