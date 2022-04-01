@@ -1,6 +1,7 @@
 import random
 import pandas as pd
 import numpy as np
+import secrets
 from datetime import timedelta
 from datetime import datetime
 from inserts import *
@@ -42,6 +43,7 @@ inStockP2 = [0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8]
 class Equipment:
     def __init__(self, ID, season=1):
         whichName = random.randint(0, len(equipmentName) - 1)
+        self.model = secrets.token_hex(6)
         self.name = equipmentName[whichName]
         self.ID = ID
         if "Boots" in self.name:
