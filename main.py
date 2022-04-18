@@ -199,9 +199,6 @@ class SpecificRental:
         self.actualEndDatetime = actualEndDatetime
         self.moneyOwed = (howManyMinutesLate // 10) * 5
 
-    def __str__(self):
-        return f"EqID: {self.equipmentID} do RentalID: {self.rentalID}"
-
 
 # QUESTIONNAIRE
 # Lists
@@ -325,6 +322,7 @@ def main():
             howManyEquipments = random.randint(1, maxEquipmentTransactionsPerPerson)
             equipmentsToRent = []
             equipmentsToBuy = []
+            toInsertList = []
             shopAmount = 0
             rentAmount = 0
             for j in range(howManyEquipments):
@@ -361,10 +359,7 @@ def main():
                         2) + ":" +
                     str(random.randint(0, 59)).zfill(2) + ":" + str(random.randint(0, 59)).zfill(2) + ".000000000")
                 timestamp = pd.Timestamp(startDatetime)
-                bill = Bill(rentAmount, timestamp)
-                toInsert.write(insertBill(bill) + '\n')
-                rental = Rental(billID)
-                toInsert.write(insertRental(rental) + '\n')
+
                 # szansa ze wzial wszystko naraz:
                 startDatetime = np.datetime64(
                     str(currentDay)[:-18] + str(random.randint(8, 18)).zfill(2) + ":" +
@@ -373,6 +368,7 @@ def main():
                 startHour = timestamp.hour
                 plannedEndHour = random.randint(startHour + 1, 20)
                 shouldRandomiseStart = random.randint(0, 100) > chanceForNotTakingAllEquipment
+                howManyMinutesLate_sum = 0
                 for eq in equipmentsToRent:
                     if shouldRandomiseStart:
                         startDatetime = np.datetime64(
@@ -383,8 +379,8 @@ def main():
                         # do dwudziestej mozna max oddac
                         startHour = timestamp.hour
                         plannedEndHour = random.randint(startHour + 1, 20)
-                    equipmentbill = EquipmentsBills(billID, eq.ID, eq.price)
-                    toInsert.write(insertEquipmentBill(equipmentbill) + '\n')
+                    toInsertList.append(EquipmentsBills(billID, eq.ID, eq.price))
+
                     howManyMinutesLate = 0
                     if plannedEndHour == 20:
                         plannedEndDatetime = np.datetime64(
@@ -401,9 +397,10 @@ def main():
                         # is on time
                         actualEndDatetime = plannedEndDatetime
 
-                    specificrental = SpecificRental(rentalID, eq.ID, startDatetime, plannedEndDatetime,
-                                                    actualEndDatetime, howManyMinutesLate)
-                    toInsert.write(insertSpecificRental(specificrental) + '\n')
+                    howManyMinutesLate_sum += howManyMinutesLate
+                    toInsertList.append(SpecificRental(rentalID, eq.ID, startDatetime, plannedEndDatetime,
+                                                    actualEndDatetime, howManyMinutesLate))
+
                     if random.randint(0, 100) > (100 - chanceForQuestionnaire):
                         q = Questionnaire(season, eq.name, eq.brandName, actualEndDatetime)
                         qData = pd.DataFrame([[q.fulfillmentDate, q.price, q.name, q.brandName, q.comfort, q.rentPrice,
@@ -411,6 +408,17 @@ def main():
                         'fulfillment_date', 'price', 'name', 'brand_name', 'comfort', 'rentPrice', 'visage', 'overall',
                         'equipment_general_rating'))
                         questionnaireExcel = pd.concat([questionnaireExcel, qData])
+                bill = Bill(rentAmount + ((howManyMinutesLate_sum // 10) * 5), timestamp)
+                toInsert.write(insertBill(bill) + '\n')
+                rental = Rental(billID)
+                toInsert.write(insertRental(rental) + '\n')
+
+                for item in toInsertList:
+                    if type(item).__name__ == 'EquipmentsBills':
+                        toInsert.write(insertEquipmentBill(item) + '\n')
+                    elif type(item).__name__ == 'SpecificRental':
+                        toInsert.write(insertSpecificRental(item) + '\n')
+
                 billID += 1
                 rentalID += 1
 
