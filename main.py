@@ -217,7 +217,7 @@ def whichName(name):
 # Class
 
 class Questionnaire:
-    def __init__(self, season, name, brandName, fulfillmentDate):
+    def __init__(self, season, id, name, brandName, fulfillmentDate):
         if season == 1:
             self.fulfillmentDate = fulfillmentDate
             self.price = rentalPriceS1[whichName(name)]
@@ -227,6 +227,7 @@ class Questionnaire:
         elif season == 3:
             self.fulfillmentDate = fulfillmentDate
             self.price = rentalPriceS3[whichName(name)]
+        self.id = id
         self.name = name
         self.brandName = brandName
         self.comfort = random.choice(rating)
@@ -282,7 +283,7 @@ def main():
         toInsert.write(insertCashier(Cashier()) + '\n')
     # Żeby mieć pusty dataframe
     questionnaireExcel = pd.DataFrame(columns=(
-    'fulfillment_date', 'price', 'name', 'brand_name', 'comfort', 'rentPrice', 'visage', 'overall',
+    'bill_number', 'fulfillment_date', 'equipment_id', 'price', 'name', 'brand_name', 'comfort', 'rentPrice', 'visage', 'overall',
     'equipment_general_rating'))
 
     billID = 1  # Kolejne indeksy bill
@@ -303,7 +304,7 @@ def main():
             toInsert = open("TMP_in.txt", "a")
             questionnaireExcel.to_excel('./results/questionnairePeriod1.xlsx', index=False)
             questionnaireExcel = pd.DataFrame(columns=(
-                'fulfillment_date', 'price', 'name', 'brand_name', 'comfort', 'rentPrice', 'visage', 'overall',
+                'bill_number', 'fulfillment_date', 'equipment_id', 'price', 'name', 'brand_name', 'comfort', 'rentPrice', 'visage', 'overall',
                 'equipment_general_rating'))
         isThunder = random.randint(0, 100) > 100 - thunderProbability
         isBadWeather = isThunder or random.randint(0, 100) > 100 - badWeatherProbability
@@ -402,10 +403,10 @@ def main():
                                                     actualEndDatetime, howManyMinutesLate))
 
                     if random.randint(0, 100) > (100 - chanceForQuestionnaire):
-                        q = Questionnaire(season, eq.name, eq.brandName, actualEndDatetime)
-                        qData = pd.DataFrame([[q.fulfillmentDate, q.price, q.name, q.brandName, q.comfort, q.rentPrice,
+                        q = Questionnaire(season, eq.ID, eq.name, eq.brandName, actualEndDatetime)
+                        qData = pd.DataFrame([[billID, q.fulfillmentDate, q.id, q.price, q.name, q.brandName, q.comfort, q.rentPrice,
                                                q.visage, q.overall, q.eqGeneralRating]], columns=(
-                        'fulfillment_date', 'price', 'name', 'brand_name', 'comfort', 'rentPrice', 'visage', 'overall',
+                        'bill_number', 'fulfillment_date', 'equipment_id', 'price', 'name', 'brand_name', 'comfort', 'rentPrice', 'visage', 'overall',
                         'equipment_general_rating'))
                         questionnaireExcel = pd.concat([questionnaireExcel, qData])
                 bill = Bill(rentAmount + ((howManyMinutesLate_sum // 10) * 5), timestamp)
@@ -427,6 +428,9 @@ def main():
     questionnaire1 = pd.read_excel('./results/questionnairePeriod1.xlsx')
     questionnaireExcel = pd.concat([questionnaire1, questionnaireExcel])
     questionnaireExcel.to_excel('./results/questionnairePeriod2.xlsx', index=False)
+
+    questionnaire1.to_csv('./results/questionnaire1.csv', index=False)
+    questionnaireExcel.to_csv('./results/questionnaire2.csv', index=False)
 
     thunders.close()
     toInsert.close()
